@@ -14,6 +14,7 @@ PRINT_STRING = 4
 READ_INT = 5
 EXIT = 10
 # other stuff
+MIN_SIZE = 2
 MAX_SIZE = 12
 
 # DATA
@@ -91,16 +92,12 @@ print_header:
 	li	$v0, PRINT_STRING
 	la	$a0, new_line
 	syscall
-	li	$v0, PRINT_STRING
 	la	$a0, asterisks
 	syscall
-	li	$v0, PRINT_STRING
 	la	$a0, title
 	syscall
-	li	$v0, PRINT_STRING
 	la	$a0, asterisks
 	syscall
-	li	$v0, PRINT_STRING
 	la	$a0, new_line
 	syscall
 

@@ -7,10 +7,12 @@
 # CONSTANTS
 #
 # syscall codes
+PRINT_STRING = 4
 READ_INT = 5
 EXIT = 10
 READ_CHAR = 12
 # other stuff
+MIN_SIZE = 2
 MAX_SIZE = 12
 ZERO = 48
 
@@ -51,10 +53,13 @@ read_puzzle:
 
 	li	$v0, READ_INT
 	syscall			# read board size
-	li	$t8, MAX_SIZE
-	addi	$t8, $t8, 1
-	slt	$t9, $v0, $t8
-	bne	$t8, $zero, 
+	li	$t9, MAX_SIZE
+	addi	$t9, $t9, 1
+	slt	$t9, $v0, $t9
+	beq	$t9, $zero, size_error
+	li	$t9, MIN_SIZE
+	slt	$t9, $v0, $t9
+	bne	$t9, $zero, size_error
 	la	$t0, board_size
 	sw	$v0, 0($t0)	# store board size
 
@@ -91,12 +96,20 @@ read_puzzle:
 #
 
 read_sums:
-
+	addi	$t9, $a0, 1
+	li	$t8, 2
+	div	$t9, $t8
+	mflo	$t9
+	addi	$t9, $t9, 1
 loop_readnums_start:
 	beq	$a0, $zero, loop_readnums_end
 	li	$v0, READ_CHAR
 	syscall			# read character
 	addi	$v0, $v0, -ZERO	# convert to number
+	slt	$t8, $v0, $t9
+	beq	$t8, $zero, sum_error
+	slt	$t8, $v0, $zero
+	bne	$t8, $zero, sum_error
 	sw	$v0, 0($a1)	# store number
 	addi	$a0, $a0, -1
 	addi	$a1, $a1, 4
@@ -160,5 +173,22 @@ loop_rows_end:
 
 size_error:
 	li	$v0, PRINT_STRING
-	la	$a0, new_line
+	la	$a0, invalid_size
 	syscall
+	li	$v0, EXIT
+	syscall
+
+sum_error:
+	li	$v0, PRINT_STRING
+	la	$a0, invalid_sum
+	syscall
+	li	$v0, EXIT
+	syscall
+
+char_error:
+	li	$v0, PRINT_STRING
+	la	$a0, invalid_char
+	syscall
+	li	$v0, EXIT
+	syscall
+
