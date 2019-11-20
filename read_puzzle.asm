@@ -64,6 +64,10 @@ read_puzzle:
 	la	$a1, col_sums
 	jal	read_sums
 
+        move    $a0, $s0	# prepare board args
+        la      $a1, board
+        jal     read_board
+
 	lw	$ra, 0($sp)
 	lw	$s0, 4($sp)
 	addi	$sp, $sp, 8
@@ -73,7 +77,7 @@ read_puzzle:
 #
 # Name:		read_sums
 #
-# Description:	Reads a specified number of characters from standard input.
+# Description:	Reads a specified number of char numbers from standard input.
 #
 # Arguments:	a0	the number of characters to read
 #		a1	the address of the first sum to store
@@ -99,3 +103,36 @@ loop_readnums_end:
 	syscall			# trim newline
 
 	jr	$ra
+
+#
+# Name:		read_board
+#
+# Description:	Reads a the tree board from standard input.
+#
+# Arguments:	a0	the board size
+#		a1	the address of the first space on the board
+#
+#	This function reads tree characters and places them in memory.
+#
+
+read_board:
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+
+	move	$t0, $a0
+loop_rows_start:
+	move	$t1, $a0
+loop_cols_start:
+	beq	$t1, $zero, loop_cols_end
+	li	$v0, READ_CHAR
+	syscall
+	sw	$v0, 0($a1)
+	addi	$a1, $a1, 1
+	addi	$t1, $t1, -1
+loop_cols_end:
+	li	$v0, READ_CHAR
+	syscall			# trim newline
+loop_rows_end:
+
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, 4
