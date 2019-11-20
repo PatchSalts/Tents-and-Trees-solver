@@ -51,6 +51,10 @@ read_puzzle:
 
 	li	$v0, READ_INT
 	syscall			# read board size
+	li	$t8, MAX_SIZE
+	addi	$t8, $t8, 1
+	slt	$t9, $v0, $t8
+	bne	$t8, $zero, 
 	la	$t0, board_size
 	sw	$v0, 0($t0)	# store board size
 
@@ -64,9 +68,9 @@ read_puzzle:
 	la	$a1, col_sums
 	jal	read_sums
 
-        move    $a0, $s0	# prepare board args
-        la      $a1, board
-        jal     read_board
+	move	$a0, $s0	# prepare board args
+	la	$a1, board
+	jal	read_board
 
 	lw	$ra, 0($sp)
 	lw	$s0, 4($sp)
@@ -149,3 +153,12 @@ loop_rows_end:
 	addi	$sp, $sp, 4
 
 	jr	$ra
+
+#
+# The following functions just print error messages and exit.
+#
+
+size_error:
+	li	$v0, PRINT_STRING
+	la	$a0, new_line
+	syscall

@@ -20,13 +20,13 @@ MAX_SIZE = 12
 	.data
 	.align	2
 
-board_size:
+board_size:			# 1 int
 	.space	1*4
-row_sums:
+row_sums:			# MAX_SIZE ints
 	.space	MAX_SIZE*4
-col_sums:
+col_sums:			# MAX_SIZE ints
 	.space	MAX_SIZE*4
-board:
+board:				# MAX_SIZE^2 chars
 	.space	MAX_SIZE*MAX_SIZE
 
 	.globl	board_size
@@ -35,7 +35,7 @@ board:
 	.globl	board
 
 # STRINGS
-blank_line:
+new_line:
 	.asciiz	"\n"
 asterisks:
 	.asciiz	"******************\n"
@@ -70,9 +70,38 @@ main:
 	addi	$sp, $sp, -4
 	sw	$ra, 0($sp)
 
+	jal	print_header
 	jal	read_puzzle
 
 	lw	$ra, 0($sp)
 	addi	$sp, $sp, 4
+
+	jr	$ra
+
+#
+# Name:		print_header
+#
+# Description:	Prints the header.
+#
+#	This function prints the header.
+#	Please don't make me explain any more than that.
+#
+
+print_header:
+	li	$v0, PRINT_STRING
+	la	$a0, new_line
+	syscall
+	li	$v0, PRINT_STRING
+	la	$a0, asterisks
+	syscall
+	li	$v0, PRINT_STRING
+	la	$a0, title
+	syscall
+	li	$v0, PRINT_STRING
+	la	$a0, asterisks
+	syscall
+	li	$v0, PRINT_STRING
+	la	$a0, new_line
+	syscall
 
 	jr	$ra
