@@ -12,6 +12,7 @@ EXIT = 10
 READ_CHAR = 12
 # other stuff
 MAX_SIZE = 12
+ZERO = 48
 
 # EXTERNAL MEMORY SPACES
 	.globl	board_size
@@ -39,21 +40,62 @@ invalid_char:
 #
 # Description:	Main logic for the program.
 #
-#	This program reads in the values and the board,
-#	placing them
+#	This function reads in the values and the board,
+#	placing them in the correct memory areas to be used by the main program.
 #
 
 read_puzzle:
-	addi	$sp, $sp, -4
+	addi	$sp, $sp, -8
 	sw	$ra, 0($sp)
+	sw	$s0, 4($sp)
 
-	li	$v0, READ_INT	# read board size
-	syscall
-	mv	$s0, $v0
+	li	$v0, READ_INT
+	syscall			# read board size
 	la	$t0, board_size
 	sw	$v0, 0($t0)	# store board size
 
+	move	$s0, $v0	# store board size for repeated calling
+
+	move	$a0, $s0	# prepare row args
+	la	$a1, row_sums
+	jal	read_sums
+
+	move	$a0, $s0	# prepare col args
+	la	$a1, col_sums
+	jal	read_sums
+
 	lw	$ra, 0($sp)
-	addi	$sp, $sp, 4
+	lw	$s0, 4($sp)
+	addi	$sp, $sp, 8
+
+	jr	$ra
+
+#
+# Name:		read_sums
+#
+# Description:	Reads a specified number of characters from standard input.
+#
+# Arguments:	a0	the number of characters to read
+#		a1	the address of the first sum to store
+#
+#	This function reads sum characters from standard input,
+#	calculates their value, and stores them in the correct memory area.
+#
+
+read_sums:
+
+loop_readnums_start:
+	beq	$a0, $zero, loop_readnums_end
+	li	$v0, READ_CHAR
+	syscall			# read character
+	addi	$v0, $v0, -ZERO	# convert to number
+	sw	$v0, 0($a1)	# store number
+	addi	$a0, $a0, -1
+	addi	$a1, $a1, 4
+	j	loop_readnums_start
+loop_readnums_end:
+
+	li	$v0, READ_CHAR
+	syscall			# trim newline
 
 	jr	$ra
