@@ -119,20 +119,33 @@ read_board:
 	addi	$sp, $sp, -4
 	sw	$ra, 0($sp)
 
-	move	$t0, $a0
+	move	$t0, $zero	# $t0 = col (x) = 0
+	move	$t1, $zero	# $t1 = row (y) = 0
+	li	$t9, MAX_SIZE	# $t9 = MAX_SIZE
+
 loop_rows_start:
-	move	$t1, $a0
+	slt	$t8, $t1, $a0
+	beq	$t8, $zero, loop_rows_end
 loop_cols_start:
-	beq	$t1, $zero, loop_cols_end
+	slt	$t8, $t0, $a0
+	beq	$t8, $zero, loop_cols_end
 	li	$v0, READ_CHAR
 	syscall
-	sw	$v0, 0($a1)
-	addi	$a1, $a1, 1
-	addi	$t1, $t1, -1
+	mul	$t8, $t1, $t9
+	add	$t8, $t8, $t0
+	add	$t8, $t8, $a1	# $t8 = place to put char
+	sb	$v0, 0($t8)
+	addi	$t0, $t0, 1
+	j	loop_cols_start
 loop_cols_end:
-	li	$v0, READ_CHAR
-	syscall			# trim newline
+	move	$t0, $zero
+	addi	$t1, $t1, 1
+	li	$v0, READ_CHAR	#trim newline
+	syscall
+	j	loop_rows_start
 loop_rows_end:
 
 	lw	$ra, 0($sp)
 	addi	$sp, $sp, 4
+
+	jr	$ra
