@@ -14,7 +14,9 @@ READ_CHAR = 12
 # other stuff
 MIN_SIZE = 2
 MAX_SIZE = 12
+GRASS = 46
 ZERO = 48
+TREE = 84
 
 # EXTERNAL MEMORY SPACES
 	.globl	board_size
@@ -148,6 +150,8 @@ loop_cols_start:
 	beq	$t8, $zero, loop_cols_end
 	li	$v0, READ_CHAR
 	syscall
+	j	check_char
+good_char:
 	mul	$t8, $t1, $t9
 	add	$t8, $t8, $t0
 	add	$t8, $t8, $a1	# $t8 = place to put char
@@ -166,6 +170,13 @@ loop_rows_end:
 	addi	$sp, $sp, 4
 
 	jr	$ra
+
+check_char:
+	li	$t6, GRASS
+	li	$t7, TREE
+	beq	$v0, $t6, good_char
+	beq	$v0, $t7, good_char
+	j	char_error
 
 #
 # The following functions just print error messages and exit.
