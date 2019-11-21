@@ -55,6 +55,7 @@ imp_puzz_mess:
 
 # EXTERNAL CODE
 	.globl	read_puzzle
+	.globl	print_puzzle
 
 #
 # Name:		MAIN PROGRAM
@@ -73,6 +74,7 @@ main:
 
 	jal	print_header
 	jal	read_puzzle
+	jal	print_init
 
 	lw	$ra, 0($sp)
 	addi	$sp, $sp, 4
@@ -100,5 +102,30 @@ print_header:
 	syscall
 	la	$a0, new_line
 	syscall
+
+	jr	$ra
+
+#
+# Name:		print_init
+#
+# Description:	Prints the initial puzzle/
+#
+#	This function prints the initial puzzle.
+#
+
+print_init:
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+
+	li	$v0, PRINT_STRING
+	la	$a0, init_puzz_mess
+	syscall
+	la	$a0, new_line
+	syscall
+
+	jal	print_puzzle
+
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, 4
 
 	jr	$ra

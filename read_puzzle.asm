@@ -24,6 +24,7 @@ TREE = 84
 	.globl	col_sums
 	.globl	board
 
+	.data
 # ERROR MESSAGES
 invalid_size:
 	.asciiz	"Invalid board size, Tents terminating\n"
