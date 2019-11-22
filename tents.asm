@@ -75,6 +75,9 @@ main:
 	jal	print_header
 	jal	read_puzzle
 	jal	print_init
+	jal	solve_puzzle
+	beq	$v0, $a0, impossible_puzzle
+	jal	print_solved
 
 	lw	$ra, 0($sp)
 	addi	$sp, $sp, 4
@@ -108,7 +111,7 @@ print_header:
 #
 # Name:		print_init
 #
-# Description:	Prints the initial puzzle/
+# Description:	Prints the initial puzzle.
 #
 #	This function prints the initial puzzle.
 #
@@ -119,6 +122,49 @@ print_init:
 
 	li	$v0, PRINT_STRING
 	la	$a0, init_puzz_mess
+	syscall
+	la	$a0, new_line
+	syscall
+
+	jal	print_puzzle
+
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, 4
+
+	jr	$ra
+
+#
+# Name:		impossible_puzzle.
+#
+# Description:	Prints "Impossible Puzzle\n" and terminates.
+#
+#	Prints "Impossible Puzzle\n" and terminates.
+#
+
+impossible_puzzle:
+	li	$v0, PRINT_STRING
+	la	$a0, imp_puzz_mess
+	syscall
+	la	$a0, new_line
+	syscall
+
+	li	$v0, EXIT
+	syscall
+
+#
+# Name:		print_solved
+#
+# Description:	Prints the solved puzzle.
+#
+#	This function prints the solved puzzle.
+#
+
+print_solved:
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+
+	li	$v0, PRINT_STRING
+	la	$a0, fin_puzz_mess
 	syscall
 	la	$a0, new_line
 	syscall
