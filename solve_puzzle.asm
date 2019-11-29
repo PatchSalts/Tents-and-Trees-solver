@@ -38,7 +38,7 @@ solve_puzzle:
 	sw	$s0, 4($sp)
 	sw	$s1, 8($sp)
 
-	j	check_board
+	jal	check_rows
 
 	lw	$ra, 0($sp)
 	lw	$s0, 4($sp)
@@ -48,19 +48,6 @@ solve_puzzle:
 	jr	$ra
 
 #
-# Name:		check_board
-#
-
-check_board:
-	addi	$sp, $sp, -4
-	sw	$ra, 0($sp)
-
-	jal	check_rows
-
-	lw	$ra, 0($sp)
-	addi	$sp, $sp, 4
-
-#
 # Name:		check_rows
 #
 
@@ -68,49 +55,27 @@ check_rows:
 	addi	$sp, $sp, -4
 	sw	$ra, 0($sp)
 
-	move	$v0, $zero
-
-	la	$t0, board_size
-	lw	$t0, 0($t0)
-	la	$t1, row_sums
+#setup
+	move	$t0, $zero
+	move	$t1, $zero
+	la	$t2, board_size
+	lw	$t2, 0($t2)
 	la	$t3, board
-	move	$t5, $zero	#which row to look at, y
-	li	$t7, TENT
-	li	$t8, MAX_SIZE
-
-checkr_loopy_start:
-	slt	$t9, $t5, $t0
-	beq	$t9, $zero, checkr_loopy_end
-	move	$t4, $zero	#sum of tents in row
-	move	$t6, $zero	#which element in the row, x
-checkr_loopx_start:
-	slt	$t9, $t6, $t0
-	beq	$t9, $zero, checkr_loopx_end
-	mul	$t2, $t5, $t8
-	add	$t2, $t2, $t6
-	add	$t2, $t2, $t3
-	lbu	$t2, 0($t2)
-	bne	$t2, $t7, checkr_skip_add
-	addi	$t4, $t4, 1
-checkr_skip_add:
-	addi	$t6, $t6, 1
-	j	checkr_loopx_start
-checkr_loopx_end:
-	
-checkr_loopy_end:
-
-	lw	$ra, 0($sp)
-	addi	$sp, $sp, 4
-	jr	$ra
-
-#
-# Name:		check_cols
-#
-
-check_cols:
-
-#
-# Name:		check_visibility
-#
-
-check_visibility:
+	li	$t5, MAX_SIZE
+loop_y_start:
+	slt	$t4, $t1, $t2
+	beq	$zero, $t4, loop_y_end
+loop_x_start:
+	slt	$t4, $t0, $t2
+	beq	$zero, $t4, loop_x_end
+	mul	$t4, $t1, $t5
+	add	$t4, $t4, $t0
+	add	$t4, $t3, $t3
+#do something
+	addi	$t0, $t0, 1
+	j	loop_x_start
+loop_x_end:
+	move	$t0, $zero
+	addi	$t1, $t1, 1
+	j	loop_y_start
+loop_y_end:
