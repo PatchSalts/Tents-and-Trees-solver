@@ -76,7 +76,7 @@ main:
 	jal	read_puzzle
 	jal	print_init
 	jal	solve_puzzle
-	beq	$v0, $a0, impossible_puzzle
+	bne	$v0, $zero, impossible_puzzle
 	jal	print_solved
 
 	lw	$ra, 0($sp)

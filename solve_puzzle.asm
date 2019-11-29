@@ -38,6 +38,7 @@ solve_puzzle:
 	sw	$s0, 4($sp)
 	sw	$s1, 8($sp)
 
+	move	$v0, $zero
 	jal	check_rows
 
 	lw	$ra, 0($sp)
@@ -62,20 +63,40 @@ check_rows:
 	lw	$t2, 0($t2)
 	la	$t3, board
 	li	$t5, MAX_SIZE
+	li	$t7, TREE
+	la	$t8, row_sums
 loop_y_start:
 	slt	$t4, $t1, $t2
 	beq	$zero, $t4, loop_y_end
+	move	$t6, $zero
 loop_x_start:
 	slt	$t4, $t0, $t2
 	beq	$zero, $t4, loop_x_end
 	mul	$t4, $t1, $t5
 	add	$t4, $t4, $t0
 	add	$t4, $t3, $t3
-#do something
+
+	lbu	$t4, 0($t4)
+	bne	$t4, 
+	addi	$t6, $t6, 1
+skip_add_sum_r:
+
 	addi	$t0, $t0, 1
 	j	loop_x_start
 loop_x_end:
+
+	add	$t4, $t8, $t1
+	lw	$t4, 0($t4)
+	beq	$t4, $t7, skip_fail
+	li	$v0, 1
+skip_fail:
+
 	move	$t0, $zero
 	addi	$t1, $t1, 1
 	j	loop_y_start
 loop_y_end:
+
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, 4
+
+	jr	$ra
